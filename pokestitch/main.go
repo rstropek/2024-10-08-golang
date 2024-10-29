@@ -11,12 +11,13 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"reflect"
 	"sync"
 
 	gim "github.com/ozankasikci/go-image-merge" // Importing a third-party package for image manipulation
 )
 
-const POKEMON = "bulbasaur"
+const POKEMON = "pikachu"
 
 // pokemon struct to unmarshal JSON data from PokeAPI.
 type pokemon struct {
@@ -54,20 +55,21 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(pokemon)
+	imageUrls := make([]string, 0)
+	spritesValue := reflect.ValueOf(pokemon.Sprites)
+	
+	for i := 0; i < spritesValue.NumField(); i++ {
+		field := spritesValue.Field(i)
+		imageUrls = append(imageUrls, field.String())
+	}
 
 	images := make(chan image.Image, 8)
 	wg := sync.WaitGroup{}
-	wg.Add(8)
+	wg.Add(len(imageUrls))
 
-	go getImage(pokemon.Sprites.FrontDefault, &wg, images)
-	go getImage(pokemon.Sprites.FrontShiny, &wg, images)
-	go getImage(pokemon.Sprites.BackDefault, &wg, images)
-	go getImage(pokemon.Sprites.BackShiny, &wg, images)
-	go getImage(pokemon.Sprites.FrontFemale, &wg, images)
-	go getImage(pokemon.Sprites.FrontShinyFemale, &wg, images)
-	go getImage(pokemon.Sprites.BackFemale, &wg, images)
-	go getImage(pokemon.Sprites.BackShinyFemale, &wg, images)
+	for _, url := range imageUrls {
+		go getImage(url, &wg, images)
+	}
 
 	wg.Wait()
 	close(images) // Closing the channel
