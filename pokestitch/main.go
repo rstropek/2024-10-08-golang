@@ -10,14 +10,11 @@ import (
 	"io"
 	"math"
 	"net/http"
-	"os"
 	"reflect"
 	"sync"
 
 	gim "github.com/ozankasikci/go-image-merge" // Importing a third-party package for image manipulation
 )
-
-const POKEMON = "pikachu"
 
 // pokemon struct to unmarshal JSON data from PokeAPI.
 type pokemon struct {
@@ -38,26 +35,52 @@ type pokemonSprites struct {
 }
 
 func main() {
-	res, err := http.Get(fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s", POKEMON))
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("GET /stitch", stitch)
+	mux.HandleFunc("GET /hello", hello)
+
+	http.ListenAndServe(":8080", mux)
+}
+
+func hello(w http.ResponseWriter, r *http.Request) {
+	// write back "Hello" in the response body
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Hello"))
+}
+
+func stitch(w http.ResponseWriter, r *http.Request) {
+	pokemonQuery := r.URL.Query().Get("pokemon")
+
+	if len(pokemonQuery) == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("pokemon query parameter is required"))
+		return
+	}
+
+	res, err := http.Get(fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s", pokemonQuery))
 	if err != nil {
-		panic(err)
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	body, err := io.ReadAll(res.Body)
-	defer res.Body.Close() 
+	defer res.Body.Close()
 	if err != nil {
-		panic(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	var pokemon pokemon
 	err = json.Unmarshal(body, &pokemon)
 	if err != nil {
-		panic(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	imageUrls := make([]string, 0)
 	spritesValue := reflect.ValueOf(pokemon.Sprites)
-	
+
 	for i := 0; i < spritesValue.NumField(); i++ {
 		field := spritesValue.Field(i)
 		imageUrls = append(imageUrls, field.String())
@@ -93,7 +116,9 @@ func main() {
 	wr.Flush()
 
 	// write to file
-	os.WriteFile("pokemon.png", b.Bytes(), 0644)
+	w.Header().Set("Content-Type", "image/png")
+	w.WriteHeader(http.StatusOK)
+	w.Write(b.Bytes())
 }
 
 func getImage(url string, wg *sync.WaitGroup, images chan<- image.Image) {
