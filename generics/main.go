@@ -6,8 +6,14 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
+type myInnerStruct[T any] struct {
+	itemInner T
+}
 
-
+type myOuterStruct[T any] struct {
+	myInnerStruct[T]
+	itemOuter T
+}
 
 type eatOrKeep interface {
 	shouldEat() bool
@@ -121,4 +127,12 @@ func main() {
 	if bag.item%2 == 0 {
 		fmt.Println("Even number")
 	}
+
+	outer := myOuterStruct[int]{
+		myInnerStruct: myInnerStruct[int]{itemInner: 1},
+		itemOuter:     2,
+	}
+
+	fmt.Println(outer.itemInner)
+	fmt.Println(outer.itemOuter)
 }
