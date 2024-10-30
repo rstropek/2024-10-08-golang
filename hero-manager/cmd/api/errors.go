@@ -31,3 +31,7 @@ func (app *application) notFoundResponse(w http.ResponseWriter, r *http.Request)
 func (app *application) methodNotAllowedResponse(w http.ResponseWriter, r *http.Request) {
 	app.errorResponse(w, r, http.StatusMethodNotAllowed, "the requested method is not allowed")
 }
+
+func (app *application) unauthorizedResponse(w http.ResponseWriter, r *http.Request) {
+	app.errorResponse(w, r, http.StatusUnauthorized, "you are not authorized to access this resource")
+}

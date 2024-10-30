@@ -13,3 +13,7 @@ Content-Type: application/json
 
 ###
 GET http://localhost:4000/error
+
+###
+GET http://localhost:4000/user
+Authorization: Bearer Rainer
