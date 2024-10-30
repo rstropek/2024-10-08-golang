@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
+
+	"github.com/rstropek/hero-manager/internal/data"
 )
 
 func (app *application) createHeroHandler(w http.ResponseWriter, r *http.Request) {
@@ -20,5 +23,19 @@ func (app *application) showHeroHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	fmt.Fprintf(w, "show the details for hero %d\n", id)
+	hero := data.Hero{
+		ID:        id,
+		Name:      "Deadpool",
+		CanFly:    false,
+		FirstSeen: time.Now(),
+		Version:   1,
+		RealName:  "Wade Wilson",
+		Abilities: []string{"Accelerated Healing", "Super Strong"},
+	}
+
+	err = app.writeJSON(w, http.StatusOK, hero, nil)
+	if err != nil {
+		app.logger.Error(err.Error())
+		http.Error(w, "the server encountered a problem and could not process your request", http.StatusInternalServerError)
+	}
 }
