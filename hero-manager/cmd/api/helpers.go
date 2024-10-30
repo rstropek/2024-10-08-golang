@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"maps"
 	"net/http"
 	"strconv"
 
@@ -26,9 +27,10 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data any, h
 		return err
 	}
 
-	for key, value := range headers {
-		w.Header()[key] = value
-	}
+	// for key, value := range headers {
+	// 	w.Header()[key] = value
+	// }
+	maps.Insert(w.Header(), maps.All(headers))
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
