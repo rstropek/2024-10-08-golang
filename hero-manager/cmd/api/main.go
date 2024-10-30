@@ -23,7 +23,7 @@ type config struct {
 type application struct {
 	config config
 	logger *slog.Logger
-	heroes *data.HeroRepository
+	repos  *data.AppRepository
 }
 
 func main() {
@@ -47,7 +47,7 @@ func main() {
 	app := &application{
 		config: cfg,
 		logger: logger,
-		heroes: &data.HeroRepository{DB: db},
+		repos:  data.NewAppRepository(db),
 	}
 
 	srv := &http.Server{

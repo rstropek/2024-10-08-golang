@@ -25,7 +25,6 @@ func (app *application) createHeroHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-
 	hero := &data.Hero{
 		Name:      input.Name,
 		CanFly:    input.CanFly,
@@ -33,7 +32,7 @@ func (app *application) createHeroHandler(w http.ResponseWriter, r *http.Request
 		RealName:  input.RealName,
 		Abilities: input.Abilities,
 	}
-	
+
 	err = hero.Validate()
 	if err != nil {
 		app.badRequestResponse(w, r, err)
@@ -51,7 +50,7 @@ func (app *application) createHeroHandler(w http.ResponseWriter, r *http.Request
 	//	return
 	//}
 
-	err = app.heroes.Insert(hero)
+	err = app.repos.Heroes.Insert(hero)
 	if err != nil {
 		app.internalServerErrorResponse(w, r, err)
 		return

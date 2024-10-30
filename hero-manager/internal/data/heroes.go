@@ -53,6 +53,18 @@ type HeroRepository struct {
 	DB *sql.DB
 }
 
+type AppRepository struct {
+	Heroes HeroRepository
+	DB     *sql.DB
+}
+
+func NewAppRepository(db *sql.DB) *AppRepository {
+	return &AppRepository{
+		Heroes: HeroRepository{DB: db},
+		DB:     db,
+	}
+}
+
 func (r *HeroRepository) Insert(hero *Hero) error {
 	query := `
 	INSERT INTO heroes (name, can_fly, first_seen, realName, abilities)
