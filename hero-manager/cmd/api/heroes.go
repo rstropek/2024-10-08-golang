@@ -19,7 +19,7 @@ func (app *application) createHeroHandler(w http.ResponseWriter, r *http.Request
 		Abilities []string  `json:"abilities,omitempty"`
 	}
 
-	err := app.readJSON(w, r, &input)
+	err := app.readJSON(r, &input)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return

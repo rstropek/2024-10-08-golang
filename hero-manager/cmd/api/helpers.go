@@ -41,7 +41,7 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data any, h
 	return nil
 }
 
-func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst any) error {
+func (app *application) readJSON(r *http.Request, dst any) error {
 	err := json.NewDecoder(r.Body).Decode(dst)
 
 	if err != nil {
