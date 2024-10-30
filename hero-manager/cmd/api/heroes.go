@@ -74,14 +74,10 @@ func (app *application) showHeroHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	hero := data.Hero{
-		ID:        id,
-		Name:      "Deadpool",
-		CanFly:    false,
-		FirstSeen: time.Now(),
-		Version:   1,
-		RealName:  "Wade Wilson",
-		Abilities: []string{"Accelerated Healing", "Super Strong"},
+	hero, err := app.repos.Heroes.Get(id)
+	if err != nil {
+		app.notFoundResponse(w, r)
+		return
 	}
 
 	err = app.writeJSON(w, http.StatusOK, hero, nil)

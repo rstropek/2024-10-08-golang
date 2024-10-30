@@ -83,5 +83,22 @@ func (r *HeroRepository) Insert(hero *Hero) error {
 }
 
 func (r *HeroRepository) Get(id int) (*Hero, error) {
-	return nil, nil
+	query := `SELECT id, first_seen, name, can_fly, realName, abilities, version FROM heroes WHERE id = $1`
+
+	var hero Hero
+
+	err := r.DB.QueryRow(query, id).Scan(
+		&hero.ID,
+		&hero.FirstSeen,
+		&hero.Name,
+		&hero.CanFly,
+		&hero.RealName,
+		pq.Array(&hero.Abilities),
+		&hero.Version,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &hero, nil
 }
