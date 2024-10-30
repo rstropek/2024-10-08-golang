@@ -6,6 +6,8 @@ import (
 	"errors"
 	"strings"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type Hero struct {
@@ -52,7 +54,20 @@ type HeroRepository struct {
 }
 
 func (r *HeroRepository) Insert(hero *Hero) error {
-	return nil
+	query := `
+	INSERT INTO heroes (name, can_fly, first_seen, realName, abilities)
+	VALUES ($1, $2, $3, $4, $5)
+	RETURNING id`
+
+	queryArgs := []any{
+		hero.Name,
+		hero.CanFly,
+		hero.FirstSeen,
+		hero.RealName,
+		pq.Array(hero.Abilities),
+	}
+
+	return r.DB.QueryRow(query, queryArgs...).Scan(&hero.ID)
 }
 
 func (r *HeroRepository) Get(id int) (*Hero, error) {

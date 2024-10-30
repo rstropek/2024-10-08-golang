@@ -51,8 +51,19 @@ func (app *application) createHeroHandler(w http.ResponseWriter, r *http.Request
 	//	return
 	//}
 
-	fmt.Fprintf(w, "create a new hero: %+v\n", input)
-	fmt.Fprintln(w, "create a new hero")
+	err = app.heroes.Insert(hero)
+	if err != nil {
+		app.internalServerErrorResponse(w, r, err)
+		return
+	}
+
+	headers := make(http.Header)
+	headers.Set("Location", fmt.Sprintf("/heroes/%d", hero.ID))
+
+	err = app.writeJSON(w, http.StatusCreated, hero, headers)
+	if err != nil {
+		app.internalServerErrorResponse(w, r, err)
+	}
 }
 
 func (app *application) showHeroHandler(w http.ResponseWriter, r *http.Request) {
