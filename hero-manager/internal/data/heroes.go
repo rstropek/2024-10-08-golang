@@ -2,6 +2,7 @@ package data
 
 import (
 	"encoding/json"
+	"errors"
 	"strings"
 	"time"
 )
@@ -33,4 +34,14 @@ func (h Hero) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(helper)
+}
+
+func (h Hero) Validate() error {
+	if len(h.Name) < 3 {
+		return errors.New("name must be at least 3 characters long")
+	}
+
+	// ...
+
+	return nil
 }

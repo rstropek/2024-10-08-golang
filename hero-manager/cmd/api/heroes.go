@@ -25,6 +25,21 @@ func (app *application) createHeroHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+
+	hero := &data.Hero{
+		Name:      input.Name,
+		CanFly:    input.CanFly,
+		FirstSeen: input.FirstSeen,
+		RealName:  input.RealName,
+		Abilities: input.Abilities,
+	}
+	
+	err = hero.Validate()
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
 	//body, err := io.ReadAll(r.Body)
 	//if err != nil {
 	//	app.badRequestResponse(w, r, err)
