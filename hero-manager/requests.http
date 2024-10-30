@@ -8,11 +8,11 @@ POST http://localhost:4000/heroes
 Content-Type: application/json
 
 {
-	"name": "Superman",
+	"name": "Catwoman",
 	"canFly": false,
-	"firstSeen": "1938-04-18T00:00:00Z",
-	"realName": "Clark Kent",
-	"abilities": ["super strength", "speed", "flight"]
+	"firstSeen": "2016-03-01T00:00:00Z",
+	"realName": "Selina Kyle",
+	"abilities": ["acrobatics", "marksman", "stealth"]
 }
 
 ###
@@ -24,3 +24,10 @@ GET http://localhost:4000/panic-in-goroutine
 ###
 GET http://localhost:4000/user
 Authorization: Bearer Rainer
+
+###
+# Return all heroes
+GET http://localhost:4000/heroes?pageSize=100&sort=name
+
+###
+GET http://localhost:4000/heroes?page=2&pageSize=10&sort=name

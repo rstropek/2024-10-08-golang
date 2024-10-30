@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -55,13 +56,11 @@ type HeroRepository struct {
 
 type AppRepository struct {
 	Heroes HeroRepository
-	DB     *sql.DB
 }
 
 func NewAppRepository(db *sql.DB) *AppRepository {
 	return &AppRepository{
 		Heroes: HeroRepository{DB: db},
-		DB:     db,
 	}
 }
 
@@ -101,4 +100,43 @@ func (r *HeroRepository) Get(id int) (*Hero, error) {
 	}
 
 	return &hero, nil
+}
+
+func (r *HeroRepository) GetAll(page, pageSize int, sort string) ([]*Hero, error) {
+	// SUPER, SUPER, SUPER IMPORTANT: Check the sort parameter to avoid SQL injection!!!!!!!!!!!!!!!!!!!
+	query := fmt.Sprintf(`
+		SELECT id, first_seen, name, can_fly, realName, abilities, version 
+		FROM heroes 
+		ORDER BY %s ASC
+		LIMIT $2 OFFSET $1`, sort)
+
+	rows, err := r.DB.Query(query, page*pageSize, pageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	heroes := []*Hero{}
+
+	for rows.Next() {
+		var hero Hero
+
+		err := rows.Scan(
+			&hero.ID,
+			&hero.FirstSeen,
+			&hero.Name,
+			&hero.CanFly,
+			&hero.RealName,
+			pq.Array(&hero.Abilities),
+			&hero.Version,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		heroes = append(heroes, &hero)
+	}
+
+	return heroes, nil
 }

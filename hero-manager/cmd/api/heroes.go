@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/rstropek/hero-manager/internal/data"
@@ -81,6 +82,34 @@ func (app *application) showHeroHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	err = app.writeJSON(w, http.StatusOK, hero, nil)
+	if err != nil {
+		app.internalServerErrorResponse(w, r, err)
+	}
+}
+
+func (app *application) listHeroesHandler(w http.ResponseWriter, r *http.Request) {
+	// GET /heroes
+
+	qs := r.URL.Query()
+	page, err := strconv.Atoi(qs.Get("page"))
+	if err != nil {
+		page = 0
+	}
+
+	pageSize, err := strconv.Atoi(qs.Get("pageSize"))
+	if err != nil {
+		pageSize = 5
+	}
+
+	sort := qs.Get("sort")
+
+	heroes, err := app.repos.Heroes.GetAll(page, pageSize, sort)
+	if err != nil {
+		app.internalServerErrorResponse(w, r, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, heroes, nil)
 	if err != nil {
 		app.internalServerErrorResponse(w, r, err)
 	}

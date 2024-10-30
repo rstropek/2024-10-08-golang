@@ -17,6 +17,7 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/healthcheck", app.healthcheckHandler)
 	router.HandlerFunc(http.MethodPost, "/heroes", app.createHeroHandler)
 	router.HandlerFunc(http.MethodGet, "/heroes/:id", app.showHeroHandler)
+	router.HandlerFunc(http.MethodGet, "/heroes", app.listHeroesHandler)
 	router.HandlerFunc(http.MethodGet, "/error", app.panicingHandler)
 	router.HandlerFunc(http.MethodGet, "/user", app.userHandler)
 	router.HandlerFunc(http.MethodGet, "/panic-in-goroutine", app.panicingHandlerInGoroutine)
