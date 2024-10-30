@@ -1,6 +1,7 @@
 package data
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"strings"
@@ -44,4 +45,16 @@ func (h Hero) Validate() error {
 	// ...
 
 	return nil
+}
+
+type HeroRepository struct {
+	DB *sql.DB
+}
+
+func (r *HeroRepository) Insert(hero *Hero) error {
+	return nil
+}
+
+func (r *HeroRepository) Get(id int) (*Hero, error) {
+	return nil, nil
 }

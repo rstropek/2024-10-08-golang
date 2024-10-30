@@ -11,6 +11,7 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/rstropek/hero-manager/internal/data"
 )
 
 type config struct {
@@ -22,6 +23,7 @@ type config struct {
 type application struct {
 	config config
 	logger *slog.Logger
+	heroes *data.HeroRepository
 }
 
 func main() {
@@ -45,6 +47,7 @@ func main() {
 	app := &application{
 		config: cfg,
 		logger: logger,
+		heroes: &data.HeroRepository{DB: db},
 	}
 
 	srv := &http.Server{
